@@ -60,7 +60,6 @@ const LoginPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="E-posta adresinizi girin"
-              required
               className="mt-1 block w-full"
             />
           </div>
@@ -77,7 +76,6 @@ const LoginPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Şifrenizi girin"
-              required
               className="mt-1 block w-full"
             />
           </div>
