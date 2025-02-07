@@ -1,18 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import dynamic from "next/dynamic";
-import "react-html5-camera-photo/build/css/index.css";
 import { Camera as CameraIcon } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import jsQR from "jsqr";
-
-const Camera = dynamic(() => import("react-html5-camera-photo"), {
-  ssr: false,
-  loading: () => <div>Kamera yükleniyor...</div>,
-});
+import Camera from "react-html5-camera-photo";
+import "react-html5-camera-photo/build/css/index.css";
 
 const QRScannerDashboard = () => {
   const [scanning, setScanning] = useState(false);
@@ -49,6 +44,7 @@ const QRScannerDashboard = () => {
       const code = jsQR(imageData.data, img.width, img.height);
 
       if (code) {
+        setError(null);
         setQrCode(code.data);
         setScanning(false);
       } else {
@@ -74,21 +70,12 @@ const QRScannerDashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {!hasCamera && (
-              <Alert variant="destructive">
-                <AlertDescription>
-                  Kamera erişimi sağlanamadı. Lütfen kamera izinlerini kontrol
-                  edin.
-                </AlertDescription>
-              </Alert>
-            )}
-
             {hasCamera && scanning ? (
-              <div className="relative border rounded-lg overflow-hidden aspect-square">
+              <div className="relative border rounded-lg aspect-square">
                 <Camera
                   onTakePhoto={handleTakePhoto}
                   idealFacingMode="environment"
-                  isImageMirror={false}
+                  imageType="jpg"
                   isSilentMode
                 />
               </div>
