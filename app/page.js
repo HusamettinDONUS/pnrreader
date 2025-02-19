@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 // pages/login.jsx
 import { useState } from "react";
@@ -14,6 +15,7 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    localStorage.setItem("userName", email.split("@")[0]);
     setError("");
 
     // try {
@@ -38,21 +40,28 @@ const LoginPage = () => {
     //   setError("Bir hata oluştu. Lütfen tekrar deneyin.");
     // }
 
-    console.log("giriş yapıldı");
     router.push("/dashboard");
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-fit mt-24 bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6">Giriş Yap</h2>
+        <div className="flex justify-center my-6">
+          <Image
+            src="/logo.png"
+            width={200}
+            height={200}
+            alt="Logo"
+            className="mx-auto"
+          />
+        </div>
         <form onSubmit={handleLogin}>
           <div className="mb-4">
             <label
               htmlFor="email"
               className="block text-sm font-medium text-gray-700"
             >
-              E-posta Adresi
+              E-posta
             </label>
             <Input
               id="email"
@@ -61,6 +70,7 @@ const LoginPage = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="E-posta adresinizi girin"
               className="mt-1 block w-full"
+              required
             />
           </div>
           <div className="mb-6">

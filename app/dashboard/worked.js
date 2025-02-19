@@ -6,19 +6,12 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import jsQR from "jsqr";
-import Image from "next/image";
-
-const items1 = ["Sıcak İçecek", "Burger Menü", "Patates Kızartması"];
-
-const items2 = ["Fotoğraf", "Video"];
 
 const QRScannerDashboard = () => {
   const [scanning, setScanning] = useState(false);
   const [hasCamera, setHasCamera] = useState(false);
   const [qrCode, setQrCode] = useState("");
   const [error, setError] = useState(null);
-  const [usedItems, setUsedItems] = useState([]);
-  const userName = localStorage.getItem("userName");
   const videoRef = useRef(null);
   const streamRef = useRef(null);
 
@@ -115,33 +108,18 @@ const QRScannerDashboard = () => {
 
     if (code) {
       setQrCode(code.data);
-      setError(null);
       stopScanning();
     } else {
       setError("QR Kod bulunamadı. Lütfen tekrar deneyin.");
     }
   };
 
-  const handleUseItem = (item) => {
-    setUsedItems([...usedItems, item]);
-    console.log(`${item} kullanıldı`);
-  };
-
   return (
     <div className="container mx-auto p-4 max-w-md">
-      <div className="flex justify-center mb-6">
-        <Image
-          src="/logo.png"
-          width={200}
-          height={200}
-          alt="Logo"
-          className="mx-auto"
-        />
-      </div>
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
-            Müessese {userName.toUpperCase()}
+            QR Kod Tarayıcı
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -174,78 +152,17 @@ const QRScannerDashboard = () => {
               </Button>
             )}
 
-            {/* {qrCode && (
+            {qrCode && (
               <div className="border rounded-lg p-4 bg-gray-50">
                 <h3 className="font-medium mb-2">Taranan QR Kod:</h3>
                 <p className="text-lg break-all">{qrCode}</p>
               </div>
-            )} */}
+            )}
 
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
-            )}
-
-            {qrCode && (
-              <div className="grid grid-cols-1 gap-4 mt-4">
-                {userName === "vikingburger" &&
-                  items1.map((item, index) => (
-                    <Card
-                      key={index}
-                      className={`${
-                        usedItems.includes(item)
-                          ? "opacity-50 bg-gray-100"
-                          : "bg-gradient-to-r from-orange-100 to-amber-100 hover:shadow-lg transition-all duration-300"
-                      }`}
-                    >
-                      <CardContent className="flex justify-between items-center p-6">
-                        <span className="text-lg font-medium text-orange-800">
-                          {item}
-                        </span>
-                        <Button
-                          className={`${
-                            usedItems.includes(item)
-                              ? "bg-gray-400"
-                              : "bg-orange-500 hover:bg-orange-600"
-                          } text-white font-semibold px-6 py-2 rounded-full transition-colors duration-300`}
-                          onClick={() => handleUseItem(item)}
-                          disabled={usedItems.includes(item)}
-                        >
-                          {usedItems.includes(item) ? "Kullanıldı" : "Kullan"}
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-                {userName === "fotografci" &&
-                  items2.map((item, index) => (
-                    <Card
-                      key={index}
-                      className={`${
-                        usedItems.includes(item)
-                          ? "opacity-50 bg-gray-100"
-                          : "bg-gradient-to-r from-blue-100 to-purple-100 hover:shadow-lg transition-all duration-300"
-                      }`}
-                    >
-                      <CardContent className="flex justify-between items-center p-6">
-                        <span className="text-lg font-medium text-blue-800">
-                          {item}
-                        </span>
-                        <Button
-                          className={`${
-                            usedItems.includes(item)
-                              ? "bg-gray-400"
-                              : "bg-blue-500 hover:bg-blue-600"
-                          } text-white font-semibold px-6 py-2 rounded-full transition-colors duration-300`}
-                          onClick={() => handleUseItem(item)}
-                          disabled={usedItems.includes(item)}
-                        >
-                          {usedItems.includes(item) ? "Kullanıldı" : "Kullan"}
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-              </div>
             )}
           </div>
         </CardContent>
