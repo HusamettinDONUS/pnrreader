@@ -174,13 +174,6 @@ const QRScannerDashboard = () => {
               </Button>
             )}
 
-            {/* {qrCode && (
-              <div className="border rounded-lg p-4 bg-gray-50">
-                <h3 className="font-medium mb-2">Taranan QR Kod:</h3>
-                <p className="text-lg break-all">{qrCode}</p>
-              </div>
-            )} */}
-
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
