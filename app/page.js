@@ -15,8 +15,8 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    localStorage.setItem("userName", email.split("@")[0]);
-    setError("");
+    // localStorage.setItem("userName", email.split("@")[0]);
+    // setError("");
 
     // try {
     //   // Backend API'ye kullanıcı bilgilerini gönderme
@@ -39,7 +39,6 @@ const LoginPage = () => {
     // } catch (err) {
     //   setError("Bir hata oluştu. Lütfen tekrar deneyin.");
     // }
-
     router.push("/dashboard");
   };
 
@@ -70,7 +69,6 @@ const LoginPage = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="E-posta adresinizi girin"
               className="mt-1 block w-full"
-              required
             />
           </div>
           <div className="mb-6">

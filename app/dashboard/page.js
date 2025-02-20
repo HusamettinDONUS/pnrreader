@@ -8,9 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import jsQR from "jsqr";
 import Image from "next/image";
 
-const items1 = ["Sıcak İçecek", "Burger Menü", "Patates Kızartması"];
-
-const items2 = ["Fotoğraf", "Video"];
+const items = ["Sıcak İçecek", "Burger Menü", "Patates Kızartması"];
 
 const QRScannerDashboard = () => {
   const [scanning, setScanning] = useState(false);
@@ -18,7 +16,6 @@ const QRScannerDashboard = () => {
   const [qrCode, setQrCode] = useState("");
   const [error, setError] = useState(null);
   const [usedItems, setUsedItems] = useState([]);
-  const userName = localStorage.getItem("userName");
   const videoRef = useRef(null);
   const streamRef = useRef(null);
 
@@ -124,7 +121,6 @@ const QRScannerDashboard = () => {
 
   const handleUseItem = (item) => {
     setUsedItems([...usedItems, item]);
-    console.log(`${item} kullanıldı`);
   };
 
   return (
@@ -141,7 +137,7 @@ const QRScannerDashboard = () => {
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
-            Müessese {userName.toUpperCase()}
+            Müessese VikingBurger
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -182,62 +178,33 @@ const QRScannerDashboard = () => {
 
             {qrCode && (
               <div className="grid grid-cols-1 gap-4 mt-4">
-                {userName === "vikingburger" &&
-                  items1.map((item, index) => (
-                    <Card
-                      key={index}
-                      className={`${
-                        usedItems.includes(item)
-                          ? "opacity-50 bg-gray-100"
-                          : "bg-gradient-to-r from-orange-100 to-amber-100 hover:shadow-lg transition-all duration-300"
-                      }`}
-                    >
-                      <CardContent className="flex justify-between items-center p-6">
-                        <span className="text-lg font-medium text-orange-800">
-                          {item}
-                        </span>
-                        <Button
-                          className={`${
-                            usedItems.includes(item)
-                              ? "bg-gray-400"
-                              : "bg-orange-500 hover:bg-orange-600"
-                          } text-white font-semibold px-6 py-2 rounded-full transition-colors duration-300`}
-                          onClick={() => handleUseItem(item)}
-                          disabled={usedItems.includes(item)}
-                        >
-                          {usedItems.includes(item) ? "Kullanıldı" : "Kullan"}
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-                {userName === "fotografci" &&
-                  items2.map((item, index) => (
-                    <Card
-                      key={index}
-                      className={`${
-                        usedItems.includes(item)
-                          ? "opacity-50 bg-gray-100"
-                          : "bg-gradient-to-r from-blue-100 to-purple-100 hover:shadow-lg transition-all duration-300"
-                      }`}
-                    >
-                      <CardContent className="flex justify-between items-center p-6">
-                        <span className="text-lg font-medium text-blue-800">
-                          {item}
-                        </span>
-                        <Button
-                          className={`${
-                            usedItems.includes(item)
-                              ? "bg-gray-400"
-                              : "bg-blue-500 hover:bg-blue-600"
-                          } text-white font-semibold px-6 py-2 rounded-full transition-colors duration-300`}
-                          onClick={() => handleUseItem(item)}
-                          disabled={usedItems.includes(item)}
-                        >
-                          {usedItems.includes(item) ? "Kullanıldı" : "Kullan"}
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
+                {items.map((item, index) => (
+                  <Card
+                    key={index}
+                    className={`${
+                      usedItems.includes(item)
+                        ? "opacity-50 bg-gray-100"
+                        : "bg-gradient-to-r from-orange-100 to-amber-100 hover:shadow-lg transition-all duration-300"
+                    }`}
+                  >
+                    <CardContent className="flex justify-between items-center p-6">
+                      <span className="text-lg font-medium text-orange-800">
+                        {item}
+                      </span>
+                      <Button
+                        className={`${
+                          usedItems.includes(item)
+                            ? "bg-gray-400"
+                            : "bg-orange-500 hover:bg-orange-600"
+                        } text-white font-semibold px-6 py-2 rounded-full transition-colors duration-300`}
+                        onClick={() => handleUseItem(item)}
+                        disabled={usedItems.includes(item)}
+                      >
+                        {usedItems.includes(item) ? "Kullanıldı" : "Kullan"}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             )}
           </div>
