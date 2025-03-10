@@ -4,47 +4,92 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-// pages/login.jsx
 import { useState } from "react";
+import axios from "axios";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
+  const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [smsCode, setSmsCode] = useState("");
+  const [verificationError, setVerificationError] = useState("");
+  const [showSmsVerification, setShowSmsVerification] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    localStorage.setItem("userName", email.split("@")[0]);
+    localStorage.setItem("userName", userName);
     setError("");
 
-    // try {
-    //   // Backend API'ye kullanıcı bilgilerini gönderme
-    //   const response = await fetch("/api/login", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ email, password }),
-    //   });
+    try {
+      const response = await axios.post(
+        "https://identity-service.vialand.com/User/Login",
+        {
+          userName: userName,
+          password: password,
+        }
+      );
 
-    //   if (response.ok) {
-    //     // Başarılı giriş sonrası ana sayfaya yönlendirme
-    //     window.location.href = "/dashboard"; // Ana sayfanızın URL'sini buraya yazın
-    //   } else {
-    //     // Giriş başarısızsa hata mesajı gösterme
-    //     const data = await response.json();
-    //     setError(data.message || "Giriş başarısız.");
-    //   }
-    // } catch (err) {
-    //   setError("Bir hata oluştu. Lütfen tekrar deneyin.");
-    // }
+      // Successful login
+      if (response.status === 200) {
+        console.log("Login Response", response.data);
+        // Show SMS verification instead of redirecting
+        setShowSmsVerification(true);
+      } else {
+        console.log("Login Response", response.data);
+        return;
+      }
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Giriş başarısız. Lütfen tekrar deneyin."
+      );
+    }
+  };
 
-    router.push("/dashboard");
+  const handleVerification = async (e) => {
+    e.preventDefault();
+    setVerificationError("");
+
+    try {
+      const response = await axios.post(
+        "https://identity-service.vialand.com/User/Verify",
+        {
+          userId: userName,
+          code: smsCode,
+        }
+      );
+
+      // Successful verification
+      if (response.status === 200) {
+        console.log("Verification Response", response.data);
+
+        // Store token and userName in localStorage
+        if (response.data.isSuccess) {
+          localStorage.setItem("userName", response.data.data.userName);
+          localStorage.setItem("jwtToken", response.data.data.jwtToken);
+          console.log("Token saved to localStorage");
+        }
+
+        // Redirect based on user role after successful verification
+        if (userName === "camera-kullanıcı") {
+          router.push("/cam-reader");
+        } else {
+          router.push("/qr-reader");
+        }
+      } else {
+        console.log("Verification Response", response.data);
+        setVerificationError("Doğrulama başarısız. Lütfen tekrar deneyin.");
+      }
+    } catch (err) {
+      setVerificationError(
+        err.response?.data?.message ||
+          "Doğrulama başarısız. Lütfen tekrar deneyin."
+      );
+    }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-fit mt-24 bg-gray-100">
+    <div className="flex items-center justify-center h-screen min-h-fit bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <div className="flex justify-center my-6">
           <Image
@@ -55,50 +100,74 @@ const LoginPage = () => {
             className="mx-auto"
           />
         </div>
-        <form onSubmit={handleLogin}>
-          <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
-              E-posta
-            </label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="E-posta adresinizi girin"
-              className="mt-1 block w-full"
-              required
-            />
-          </div>
-          <div className="mb-6">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Şifre
-            </label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Şifrenizi girin"
-              className="mt-1 block w-full"
-            />
-          </div>
-          {error && <p className="text-red-500 mb-4">{error}</p>}
-          <Button type="submit" className="w-full">
-            Giriş Yap
-          </Button>
-        </form>
-        <div className="mt-4 text-center">
-          <a href="#" className="text-sm text-blue-500 hover:underline">
-            Şifremi Unuttum
-          </a>
-        </div>
+
+        {!showSmsVerification ? (
+          <form onSubmit={handleLogin}>
+            <div className="mb-4">
+              <label
+                htmlFor="userName"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Kullanıcı Adı
+              </label>
+              <Input
+                id="userName"
+                type="text"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                placeholder="Kullanıcı adınızı girin"
+                className="mt-1 block w-full"
+                required
+              />
+            </div>
+            <div className="mb-6">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Şifre
+              </label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Şifrenizi girin"
+                className="mt-1 block w-full"
+              />
+            </div>
+            {error && <p className="text-red-500 mb-4">{error}</p>}
+            <Button type="submit" className="w-full">
+              Giriş Yap
+            </Button>
+          </form>
+        ) : (
+          <form onSubmit={handleVerification}>
+            <div className="mb-6">
+              <label
+                htmlFor="smsCode"
+                className="block text-sm font-medium text-gray-700"
+              >
+                SMS Doğrulama Kodu
+              </label>
+              <Input
+                id="smsCode"
+                type="text"
+                value={smsCode}
+                onChange={(e) => setSmsCode(e.target.value)}
+                placeholder="SMS kodunu girin"
+                className="mt-1 block w-full"
+                required
+              />
+            </div>
+            {verificationError && (
+              <p className="text-red-500 mb-4">{verificationError}</p>
+            )}
+            <Button type="submit" className="w-full">
+              Doğrula
+            </Button>
+          </form>
+        )}
       </div>
     </div>
   );
