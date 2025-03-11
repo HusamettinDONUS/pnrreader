@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import axios from "axios";
 // items1 ve items2 sabit dizilerine artık ihtiyaç yok çünkü API'den gelecek
 
 const QRTextInputDashboard = () => {
+  const inputRef = useRef(null);
   const [qrCode, setQrCode] = useState("");
   const [inputText, setInputText] = useState("");
   const [error, setError] = useState(null);
@@ -27,6 +28,11 @@ const QRTextInputDashboard = () => {
     if (typeof window !== "undefined") {
       setUserName(localStorage.getItem("userName") ?? null);
       setJwtToken(localStorage.getItem("jwtToken") ?? null);
+
+      // Input alanına focus yapma
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
     }
   }, []);
 
@@ -126,6 +132,11 @@ const QRTextInputDashboard = () => {
     setError(null);
     setApiResponse(null);
     setItems([]);
+
+    // Doğrudan focus yapma, setTimeout'e gerek yok
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
   };
 
   return (
@@ -152,6 +163,7 @@ const QRTextInputDashboard = () => {
               className="flex justify-center items-center gap-4"
             >
               <Input
+                ref={inputRef}
                 type="text"
                 placeholder="QR Kodu okutunuz"
                 value={inputText}
