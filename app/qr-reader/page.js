@@ -112,6 +112,38 @@ const QRTextInputDashboard = () => {
         // Update local state only if API call was successful
         setUsedItems([...usedItems, orderId]);
         console.log(`${orderId} kullanıldı: API yanıtı:`, response.data);
+
+        // Refresh the product list by making a new GET request
+        try {
+          setLoading(true);
+          const refreshResponse = await axios.get(
+            `https://tourniquet.vialand.com/tourniquet/tourniquet/all-addon?uid=${encodeURIComponent(
+              qrCode
+            )}`,
+            {
+              headers: {
+                Authorization: `bearer ${jwtToken}`,
+              },
+            }
+          );
+
+          setApiResponse(refreshResponse.data);
+          console.log("Ürün listesi yenilendi:", refreshResponse.data);
+
+          // API'den dönen verileri işleme
+          if (refreshResponse.data.isSuccess && refreshResponse.data.data) {
+            setItems(refreshResponse.data.data);
+            // API'den dönen kullanılmış öğeleri tanımlama
+            const alreadyUsedItems = refreshResponse.data.data
+              .filter((item) => item.isUsed)
+              .map((item) => item.orderId);
+            setUsedItems(alreadyUsedItems);
+          }
+        } catch (refreshErr) {
+          console.error("Ürün listesi yenileme hatası:", refreshErr);
+        } finally {
+          setLoading(false);
+        }
       } else {
         setError(response.data.message || "İşlem başarısız oldu");
         console.error("API hatası:", response.data);
@@ -194,7 +226,7 @@ const QRTextInputDashboard = () => {
                   <Card
                     key={index}
                     className={`${
-                      usedItems.includes(item.orderId)
+                      item.isUsed
                         ? "opacity-50 bg-gray-100"
                         : "bg-gradient-to-r from-orange-100 to-amber-100 hover:shadow-lg transition-all duration-300"
                     }`}
@@ -205,17 +237,16 @@ const QRTextInputDashboard = () => {
                       </span>
                       <Button
                         className={`${
-                          usedItems.includes(item.orderId)
+                          item.isUsed
                             ? "bg-gray-400"
                             : "bg-orange-500 hover:bg-orange-600"
                         } text-white font-semibold px-6 py-2 rounded-full transition-colors duration-300`}
                         onClick={() => handleUseItem(item.orderId, item.value)}
                         disabled={
-                          usedItems.includes(item.orderId) ||
-                          processingItems.includes(item.orderId)
+                          item.isUsed || processingItems.includes(item.orderId)
                         }
                       >
-                        {usedItems.includes(item.orderId)
+                        {item.isUsed
                           ? "Kullanıldı"
                           : processingItems.includes(item.orderId)
                           ? "İşleniyor..."
