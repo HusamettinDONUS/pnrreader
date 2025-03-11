@@ -68,6 +68,12 @@ const LoginPage = () => {
           localStorage.setItem("userName", response.data.data.userName);
           localStorage.setItem("jwtToken", response.data.data.jwtToken);
           console.log("Token saved to localStorage");
+        } else {
+          setError(
+            err.response?.data?.message ||
+              "Giriş başarısız. Lütfen tekrar deneyin."
+          );
+          return;
         }
 
         // Redirect based on user role after successful verification
